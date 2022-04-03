@@ -1,0 +1,74 @@
+plugins {
+    id 'java-library'
+    id "io.qameta.allure" version "2.9.6"
+}
+
+repositories {
+    mavenCentral()
+}
+
+def allureVersion = "2.17.2",
+    junitVersion = "5.8.2",
+    commons_io_version = "2.6",
+    java_faker_version = "1.0.2",
+    apache_poi = "3.14",
+    junit_jupiter_params_version = "5.6.2",
+    rest_assured_version = "4.4.0",
+    assertj_core_version = "3.22.0",
+    hamcrest_version = "2.0.0.0"
+
+allure {
+    report {
+        version.set(allureVersion)
+    }
+    adapter {
+        autoconfigure.set(true)
+        aspectjWeaver.set(true)
+        frameworks {
+            junit5 {
+                adapterVersion.set(allureVersion)
+            }
+        }
+    }
+}
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
+
+dependencies {
+    testImplementation(
+            "com.codeborne:selenide:6.2.1",
+            "io.qameta.allure:allure-selenide:$allureVersion",
+            "org.junit.jupiter:junit-jupiter-api:$junitVersion",
+            "commons-io:commons-io:$commons_io_version",
+            "com.github.javafaker:javafaker:$java_faker_version",
+            "org.apache.poi:poi:$apache_poi",
+            "org.junit.jupiter:junit-jupiter-params:$junit_jupiter_params_version",
+            "io.rest-assured:rest-assured:$rest_assured_version",
+            "org.assertj:assertj-core:$assertj_core_version",
+            "io.rest-assured:json-schema-validator:3.1.0",
+            "org.hamcrest:java-hamcrest:$hamcrest_version"
+    )
+
+    testRuntimeOnly(
+            "org.slf4j:slf4j-simple:1.7.29",
+            "org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+    systemProperties(System.getProperties())
+
+    testLogging {
+        lifecycle {
+            events "started", "skipped", "failed", "standard_error", "standard_out"
+            exceptionFormat "short"
+        }
+    }
+
+}
+task configured_tests(type: Test) {
+    useJUnitPlatform {
+        includeTags "configured"
+    }
+}
