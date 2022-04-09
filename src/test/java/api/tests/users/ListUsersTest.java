@@ -9,6 +9,7 @@ import java.util.*;
 
 import static io.restassured.RestAssured.*;
 import static io.restassured.module.jsv.JsonSchemaValidator.*;
+import static org.hamcrest.Matchers.*;
 
 @Tag("API")
 public class ListUsersTest {
@@ -36,7 +37,8 @@ public class ListUsersTest {
                 .when()
                 .get("api/users?page=2")
                 .then()
-                .extract().body().jsonPath().getList("data", UsersData.class);
+                .extract()
+                .body().jsonPath().getList("data", UsersData.class);
         for (int i = 0; i < users.size(); i++) {
             Assertions.assertThat(users.get(i).getId().toString()).isNotEmpty();
             Assertions.assertThat(users.get(i).getAvatar().toString()).isNotEmpty();
@@ -44,7 +46,26 @@ public class ListUsersTest {
             Assertions.assertThat(users.get(i).getFirst_name().toString()).isNotEmpty();
             Assertions.assertThat(users.get(i).getLast_name().toString()).isNotEmpty();
 
+
         }
 
     }
+
+    @Test
+    public void validateDataResultNotEmpty() {
+        Specification.setSpecification(Specification.requestSpec("https://reqres.in"), Specification.responseSpecOK200());
+        given()
+                .when()
+                .get("api/users?page=2")
+                .then()
+                .assertThat()
+                .body("per_page", not(blankOrNullString()),
+                        "per_page", not(blankOrNullString()),
+                        "total", not(blankOrNullString()),
+                        "total_pages", not(blankOrNullString())
+                );
+
+
+    }
+
 }

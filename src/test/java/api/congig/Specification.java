@@ -17,6 +17,7 @@ public class Specification {
     public static ResponseSpecification responseSpecOK200(){
         return new ResponseSpecBuilder()
                 .expectStatusCode(200)
+                .expectContentType(ContentType.JSON)
                 .build();
     }
     public static ResponseSpecification responseSpecError400(){
